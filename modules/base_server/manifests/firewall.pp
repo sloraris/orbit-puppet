@@ -37,16 +37,12 @@ class base_server::firewall {
   # Accept established connections
   nftables::rule { 'accept-established':
     content => 'ct state established,related accept',
-    table   => 'inet',
-    chain   => 'input',
     order   => '10',
   }
 
   # Accept loopback
   nftables::rule { 'allow-loopback':
     content => 'iifname lo accept',
-    table   => 'inet',
-    chain   => 'input',
     order   => '11',
   }
 
@@ -81,8 +77,6 @@ class base_server::firewall {
 
     nftables::rule { "allow-${protocol}-port-${port}-from-${source}":
       content => $rule_content,
-      table   => 'inet',
-      chain   => 'input',
       order   => sprintf('%02d', 20 + $i),
     }
   }
@@ -90,8 +84,6 @@ class base_server::firewall {
   # Drop everything else
   nftables::rule { 'drop-all':
     content => 'drop',
-    table   => 'inet',
-    chain   => 'input',
     order   => '99',
   }
 }
