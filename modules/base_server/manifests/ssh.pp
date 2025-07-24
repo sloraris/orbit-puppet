@@ -1,7 +1,7 @@
 # modules/base_server/manifests/ssh.pp
 class base_server::ssh {
-  $github_user = lookup('base_server::ssh::github_user', String)
-  $ssh_user    = lookup('base_server::ssh::ssh_user', String)
+  $github_user = lookup('github_user', String)
+  $ssh_user    = lookup('ssh_user', String)
 
   # Ensure user's .ssh directory exists
   file { "/home/${ssh_user}/.ssh":
