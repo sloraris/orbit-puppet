@@ -31,7 +31,7 @@ class base_server::firewall {
   # Flush existing rules only once during initial Puppet runs (optional but recommended)
   nftables::rule { 'flush-rules':
     content => 'flush ruleset',
-    order   => '000',
+    order   => '00',
   }
 
   # Accept established connections
@@ -39,7 +39,7 @@ class base_server::firewall {
     content => 'ct state established,related accept',
     table   => 'inet',
     chain   => 'input',
-    order   => '100',
+    order   => '10',
   }
 
   # Accept loopback
@@ -47,7 +47,7 @@ class base_server::firewall {
     content => 'iifname lo accept',
     table   => 'inet',
     chain   => 'input',
-    order   => '110',
+    order   => '11',
   }
 
   # Allow each port with protocol and source restrictions
@@ -83,7 +83,7 @@ class base_server::firewall {
       content => $rule_content,
       table   => 'inet',
       chain   => 'input',
-      order   => "2${i}",
+      order   => sprintf('%02d', 20 + $i),
     }
   }
 
@@ -92,6 +92,6 @@ class base_server::firewall {
     content => 'drop',
     table   => 'inet',
     chain   => 'input',
-    order   => '999',
+    order   => '99',
   }
 }
