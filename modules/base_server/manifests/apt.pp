@@ -7,9 +7,9 @@ class base_server::apt {
       loglevel  => 'notice',
     },
     purge => {
-      sources.list   => true,
-      sources.list.d => true,
-      preferences.d  => true,
+      'sources.list'   => true,
+      'sources.list.d' => true,
+      'preferences.d'  => true,
     },
   }
 
