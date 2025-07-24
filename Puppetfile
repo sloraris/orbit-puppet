@@ -3,7 +3,7 @@ forge 'https://forge.puppet.com'
 # External dependencies
 mod 'puppetlabs/stdlib', '8.0.0'
 mod 'puppetlabs/apt', '8.0.0'
-mod 'puppetlabs/nftables', '1.0.0'
+mod 'nftables', '4.2.0'
 mod 'puppetlabs/firewall', '3.0.0'
 
 # Local modules
