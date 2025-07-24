@@ -3,13 +3,13 @@ timezone: UTC
 
 # Users/groups to be created and managed
 base_users:
-  - orbit
+  - "orbit"
 
 # SSH keys to be added from GitHub
-github_user: sloraris
-ssh::ssh_user: orbit
+github_user: "sloraris"
+ssh_user: "orbit"
 
 # Komodo node settings
-komodo_user: komodo
-komodo_group: komodo
+komodo_user: "komodo"
+komodo_group: "komodo"
 core_node: "luna.orbit"
