@@ -1,0 +1,22 @@
+{
+  "name": "orbit-komodo",
+  "version": "1.0.0",
+  "author": "sloraris",
+  "summary": "Komodo monitoring and observability platform for Orbit infrastructure",
+  "license": "MIT",
+  "source": "https://github.com/sloraris/puppet",
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 8.0.0 < 10.0.0"
+    },
+    {
+      "name": "orbit-docker",
+      "version_requirement": ">= 1.0.0 < 2.0.0"
+    },
+    {
+      "name": "puppetlabs/firewall",
+      "version_requirement": ">= 3.0.0 < 4.0.0"
+    }
+  ]
+}

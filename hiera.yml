@@ -1,0 +1,14 @@
+# /etc/puppetlabs/code/environments/production/hiera.yaml
+version: 5
+
+defaults:
+  datadir: data
+  data_hash: yaml_data
+  merge_behavior: deep
+
+hierarchy:
+  - name: "Per-node data"
+    path: "nodes.yml"
+
+  - name: "Global settings"
+    path: "global.yml"

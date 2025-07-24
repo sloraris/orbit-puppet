@@ -1,0 +1,22 @@
+{
+  "name": "orbit-base_server",
+  "version": "1.0.0",
+  "author": "sloraris",
+  "summary": "Base server configuration for Orbit infrastructure",
+  "license": "MIT",
+  "source": "https://github.com/sloraris/puppet",
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 8.0.0 < 10.0.0"
+    },
+    {
+      "name": "puppetlabs/apt",
+      "version_requirement": ">= 8.0.0 < 10.0.0"
+    },
+    {
+      "name": "puppetlabs/nftables",
+      "version_requirement": ">= 1.0.0 < 3.0.0"
+    }
+  ]
+}

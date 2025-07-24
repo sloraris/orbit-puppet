@@ -1,0 +1,39 @@
+# This file contains the classes and ports applicable to each role
+role_classes:
+  base:
+    classes:
+      - base_server
+      - docker
+      # - komodo::periphery
+    ports:
+      - port: 22
+        protocol: tcp
+
+  swarm:
+    classes:
+      - swarm::swarm
+    ports:
+      - port: 7946
+        protocol: tcp
+      - port: 7946
+        protocol: udp
+      - port: 4789
+        protocol: udp
+
+  swarm_manager:
+    classes:
+      - swarm::swarm_manager
+    ports:
+      - port: 2377
+        protocol: tcp
+
+  komodo_core:
+    classes:
+      - komodo::core
+
+  komodo_periphery:
+    classes:
+      - komodo::periphery
+    ports:
+      - port: 8120
+        protocol: tcp

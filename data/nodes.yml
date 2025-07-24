@@ -1,0 +1,12 @@
+luna.orbit:
+  roles:
+    - swarm
+    - swarm_manager
+
+echo.orbit:
+  roles:
+    - swarm
+
+artemis.orbit:
+  roles:
+    - swarm

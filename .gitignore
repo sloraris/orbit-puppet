@@ -1,0 +1,142 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Ubuntu/Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Puppet specific
+*.swp
+*.swo
+*~
+*.tmp
+*.bak
+*.orig
+*.rej
+*.log
+*.pid
+*.lock
+
+# Puppet modules and manifests
+# Uncomment if you want to ignore specific module directories
+# modules/*/spec/fixtures/
+# modules/*/spec/acceptance/
+# modules/*/spec/unit/
+
+# Puppet environments
+# environments/*/modules/
+# environments/*/manifests/
+
+# Puppet server
+# Uncomment if using Puppet server
+# ssl/
+# var/
+# log/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Ruby (if using Puppet with Ruby)
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
+/tmp/
+.bundle/
+vendor/bundle
+lib/bundler/man/
+
+# RVM
+/.rvmrc
+
+# rbenv
+/.ruby-version
+/.ruby-gemset
+
+# Bundler
+/.bundle/
+/vendor/bundle
+
+# Node.js (if using any Node.js tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python (if using any Python tools)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Backup files
+*.backup
+*.old
+*.save
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
