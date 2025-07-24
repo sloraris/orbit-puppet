@@ -64,7 +64,41 @@ The configuration uses Hiera 5 with the following hierarchy:
 
 ### Installation
 
-TODO: Add repo installation instructions
+#### For Puppet Master Setup
+
+1. **Clone the repository** (if not already done):
+   ```bash
+   cd /etc/puppet/code/environments/production
+   git clone <repository-url> .
+   ```
+
+2. **Install module dependencies**:
+   ```bash
+   r10k puppetfile install
+   ```
+
+3. **Set proper permissions**:
+   ```bash
+   chown -R pe-puppet:pe-puppet /etc/puppetlabs/code/environments/production
+   chmod -R 755 /etc/puppetlabs/code/environments/production
+   ```
+
+4. **Restart Puppet services**:
+   ```bash
+   systemctl restart ppuppetserver
+   ```
+
+#### For Puppet Nodes
+
+1. **Ensure the node is enrolled** with the Puppet master
+2. **Set the environment** (if not using production):
+   ```bash
+   puppet config set environment production
+   ```
+3. **Run the initial Puppet agent**:
+   ```bash
+   puppet agent --test
+   ```
 
 ### Node Classification
 
