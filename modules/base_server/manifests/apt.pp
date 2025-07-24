@@ -12,9 +12,4 @@ class base_server::apt {
       'preferences.d'  => true,
     },
   }
-
-  # Update apt cache (only perform once a day)
-  apt::update { 'daily':
-    frequency => 'daily',
-  }
 }
