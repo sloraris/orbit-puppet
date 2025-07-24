@@ -7,7 +7,7 @@ defaults:
 
 hierarchy:
   - name: "Per-node data"
-    path: "nodes.yml"
+    path: "nodes.yaml"
 
   - name: "Global settings"
-    path: "global.yml"
+    path: "global.yaml"
