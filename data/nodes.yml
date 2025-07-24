@@ -1,5 +1,6 @@
 luna.orbit:
   roles:
+    - puppetmaster
     - swarm
     - swarm_manager
 

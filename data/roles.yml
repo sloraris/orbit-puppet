@@ -9,6 +9,12 @@ role_classes:
       - port: 22
         protocol: tcp
 
+  puppetmaster:
+    # classes:
+    ports:
+      - port: 8140
+        protocol: tcp
+
   swarm:
     classes:
       - swarm::swarm
