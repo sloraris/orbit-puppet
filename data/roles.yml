@@ -8,12 +8,14 @@ role_classes:
     ports:
       - port: 22
         protocol: tcp
+        source: lan
 
   puppetmaster:
     # classes:
     ports:
       - port: 8140
         protocol: tcp
+        source: lan
 
   swarm:
     classes:
@@ -21,10 +23,13 @@ role_classes:
     ports:
       - port: 7946
         protocol: tcp
+        source: lan
       - port: 7946
         protocol: udp
+        source: lan
       - port: 4789
         protocol: udp
+        source: lan
 
   swarm_manager:
     classes:
@@ -32,10 +37,15 @@ role_classes:
     ports:
       - port: 2377
         protocol: tcp
+        source: lan
 
   komodo_core:
     classes:
       - komodo::core
+    ports:
+      - port: 8120
+        protocol: tcp
+        source: localhost
 
   komodo_periphery:
     classes:

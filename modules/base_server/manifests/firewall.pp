@@ -1,8 +1,6 @@
 # modules/base_server/manifests/firewall.pp
 class base_server::firewall {
 
-  #### TODO: Allow ssh from local IPs
-
   include nftables
 
   $roles         = lookup('roles', Array[String], 'unique', [])
@@ -52,16 +50,37 @@ class base_server::firewall {
     order   => '110',
   }
 
-  # Allow each port with protocol
+  # Allow each port with protocol and source restrictions
   $all_ports.each |$port_config, $i| {
     $port = $port_config['port']
     $protocol = $port_config['protocol'] ? {
       undef => 'tcp',
       default => $port_config['protocol']
     }
+    $source = $port_config['source'] ? {
+      undef => 'any',
+      default => $port_config['source']
+    }
 
-    nftables::rule { "allow-${protocol}-port-${port}":
-      content => "${protocol} dport ${port} accept",
+    # Build the rule content based on source restriction
+    $rule_content = case $source {
+      'localhost': {
+        "${protocol} dport ${port} iifname lo accept"
+      }
+      'lan': {
+        "${protocol} dport ${port} ip saddr 10.0.0.0/8 accept"
+      }
+      'any': {
+        "${protocol} dport ${port} accept"
+      }
+      default: {
+        # If source is a specific IP or CIDR, use it directly
+        "${protocol} dport ${port} ip saddr ${source} accept"
+      }
+    }
+
+    nftables::rule { "allow-${protocol}-port-${port}-from-${source}":
+      content => $rule_content,
       table   => 'inet',
       chain   => 'input',
       order   => "2${i}",
