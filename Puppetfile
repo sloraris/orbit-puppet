@@ -5,6 +5,7 @@ mod 'puppetlabs/stdlib', '8.0.0'
 mod 'puppetlabs/apt', '8.0.0'
 mod 'puppet/nftables', '4.2.0'
 mod 'puppetlabs/firewall', '3.0.0'
+mod 'camptocamp/systemd', '4.0.0'
 
 # Local modules
 mod 'orbit-base_server', :local => true
