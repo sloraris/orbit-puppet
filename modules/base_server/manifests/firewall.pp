@@ -18,7 +18,6 @@ class base_server::firewall {
   $role_classes  = lookup('role_classes', Hash, 'first', {})
 
   # Debug output
-  notify { "Debug - Node name: ${::fqdn}": }
   notify { "Debug - Roles lookup result: ${roles}": }
   notify { "Debug - Role classes lookup result: ${role_classes}": }
   notify { "Debug - Role classes keys: ${role_classes.keys}": }
