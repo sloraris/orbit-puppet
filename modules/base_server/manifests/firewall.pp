@@ -5,9 +5,10 @@ class base_server::firewall {
   include ufw
 
   # Enable UFW
-  ufw::allow { 'ufw-allow-ssh':
-    port => '22',
-    ip   => 'any',
+  ufw::rule { 'allow-ssh':
+    ensure => 'present',
+    port   => '22',
+    ip     => 'any',
   }
 
   $roles         = lookup('roles', Array[String], 'unique', [])
@@ -64,31 +65,36 @@ class base_server::firewall {
       }
     }
 
-    ufw::allow { "ufw-allow-${protocol}-${port}-from-${source}":
-      port => $port,
-      ip   => $ufw_source,
-      proto => $protocol,
+    ufw::rule { "allow-${protocol}-${port}-from-${source}":
+      ensure => 'present',
+      port   => $port,
+      ip     => $ufw_source,
+      proto  => $protocol,
     }
   }
 
   # Enable UFW with default deny policy
-  ufw::limit { 'ufw-limit-ssh':
-    port => '22',
+  ufw::rule { 'limit-ssh':
+    ensure => 'present',
+    port   => '22',
+    limit  => true,
   }
 
   # Set default policies
-  ufw::default { 'ufw-default-incoming':
+  ufw::default { 'default-incoming':
+    ensure    => 'present',
     direction => 'incoming',
     policy    => 'deny',
   }
 
-  ufw::default { 'ufw-default-outgoing':
+  ufw::default { 'default-outgoing':
+    ensure    => 'present',
     direction => 'outgoing',
     policy    => 'allow',
   }
 
   # Enable UFW
-  ufw::enable { 'ufw-enable':
+  ufw::enable { 'enable-ufw':
     ensure => 'enabled',
   }
 }

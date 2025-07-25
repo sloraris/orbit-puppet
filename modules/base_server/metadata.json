@@ -15,8 +15,8 @@
       "version_requirement": ">= 8.0.0 < 10.0.0"
     },
     {
-      "name": "puppetlabs/ufw",
-      "version_requirement": ">= 3.0.0 < 4.0.0"
+      "name": "kogitoapp/ufw",
+      "version_requirement": ">= 1.0.0 < 2.0.0"
     }
   ]
 }
