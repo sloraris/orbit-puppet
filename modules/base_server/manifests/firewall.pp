@@ -60,16 +60,16 @@ class base_server::firewall {
 
     ufw_rule { "allow-${protocol}-${port}-from-${source}":
       ensure => 'present',
-      port   => $port,
-      ip     => $ufw_source,
-      proto  => $protocol,
+      to_ports_app  => $port,
+      ip            => $ufw_source,
+      proto         => $protocol,
     }
   }
 
   # Enable UFW with default deny policy
   ufw_rule { 'limit-ssh':
-    ensure => 'present',
-    port   => '22',
-    limit  => true,
+    ensure        => 'present',
+    to_ports_app  => '22',
+    limit         => true,
   }
 }
