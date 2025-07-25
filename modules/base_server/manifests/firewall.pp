@@ -26,6 +26,10 @@ class base_server::firewall {
   $test_node_data = lookup('echo.orbit', Hash, 'first', {})
   notify { "Debug - Test node data for echo.orbit: ${test_node_data}": }
 
+  # TEMPORARY: Hardcode roles for testing
+  $test_roles = ['swarm']
+  notify { "Debug - Using hardcoded roles: ${test_roles}": }
+
   # Get base ports (applied to all servers)
   $base_ports    = $role_classes['base'] ? {
     undef => [],
@@ -35,8 +39,8 @@ class base_server::firewall {
     }
   }
 
-  # Get role-specific ports
-  $role_ports    = flatten($roles.map |$role| {
+  # Get role-specific ports using hardcoded roles for testing
+  $role_ports    = flatten($test_roles.map |$role| {
     $role_classes[$role] ? {
       undef => [],
       default => $role_classes[$role]['ports'] ? {
