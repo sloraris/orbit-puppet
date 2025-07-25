@@ -1,11 +1,5 @@
 # This file contains the classes and ports applicable to each role
 role_classes:
-  base:
-    classes:
-      - base_server
-      - docker
-      # - komodo::periphery
-
   puppetmaster:
     ports:
       - port: 8140

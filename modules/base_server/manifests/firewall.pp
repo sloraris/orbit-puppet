@@ -22,6 +22,10 @@ class base_server::firewall {
   notify { "Debug - Role classes lookup result: ${role_classes}": }
   notify { "Debug - Role classes keys: ${role_classes.keys}": }
 
+  # Test direct lookup for node data
+  $test_node_data = lookup('echo.orbit', Hash, 'first', {})
+  notify { "Debug - Test node data for echo.orbit: ${test_node_data}": }
+
   # Get base ports (applied to all servers)
   $base_ports    = $role_classes['base'] ? {
     undef => [],
