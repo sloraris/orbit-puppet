@@ -92,4 +92,29 @@ class base_server::firewall {
       proto           => $protocol,
     }
   }
+
+  # Remove rules for roles that are no longer assigned
+  # This ensures cleanup when roles change
+  $all_possible_roles = $role_classes.keys
+  $unassigned_roles = $all_possible_roles - $roles
+
+  $unassigned_roles.each |$role| {
+    if $role_classes[$role] and $role_classes[$role]['ports'] {
+      $role_classes[$role]['ports'].each |$port_config| {
+        $port = $port_config['port']
+        $protocol = $port_config['protocol'] ? {
+          undef => 'tcp',
+          default => $port_config['protocol']
+        }
+        $source = $port_config['source'] ? {
+          undef => 'any',
+          default => $port_config['source']
+        }
+
+        ufw_rule { "allow-${protocol}-${port}-from-${source}":
+          ensure => 'absent',
+        }
+      }
+    }
+  }
 }

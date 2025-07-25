@@ -1,0 +1,4 @@
+roles:
+  - puppetmaster
+  - swarm
+  - swarm_manager
