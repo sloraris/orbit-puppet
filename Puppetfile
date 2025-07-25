@@ -5,7 +5,7 @@ mod 'puppetlabs/stdlib', '8.0.0'
 mod 'puppetlabs/apt', '8.0.0'
 mod 'puppetlabs/firewall', '3.0.0'
 mod 'puppetlabs/concat', '6.0.0'
-mod 'puppet/nftables', '4.2.0'
+mod 'puppetlabs/ufw', '3.0.0'
 mod 'puppet/systemd', '4.0.0'
 
 # Local modules

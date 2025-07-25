@@ -1,5 +1,5 @@
 node default {
   contain base_server
 
-  include lookup('classes', Array[String], 'unique', [])
+  include lookup('roles', Array[String], 'unique', [])
 }

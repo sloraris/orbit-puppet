@@ -1,7 +1,14 @@
 # modules/base_server/manifests/firewall.pp
 class base_server::firewall {
 
-  include nftables
+  # Include UFW module
+  include ufw
+
+  # Enable UFW
+  ufw::allow { 'ufw-allow-ssh':
+    port => '22',
+    ip   => 'any',
+  }
 
   $roles         = lookup('roles', Array[String], 'unique', [])
   $role_classes  = lookup('role_classes', Hash, 'first', {})
@@ -28,26 +35,8 @@ class base_server::firewall {
 
   $all_ports     = unique($base_ports + $role_ports)
 
-  # Flush existing rules only once during initial Puppet runs (optional but recommended)
-  nftables::rule { 'flush-rules':
-    content => 'flush ruleset',
-    order   => '00',
-  }
-
-  # Accept established connections
-  nftables::rule { 'accept-established':
-    content => 'ct state established,related accept',
-    order   => '10',
-  }
-
-  # Accept loopback
-  nftables::rule { 'allow-loopback':
-    content => 'iifname lo accept',
-    order   => '11',
-  }
-
   # Allow each port with protocol and source restrictions
-  $all_ports.each |$port_config, $i| {
+  $all_ports.each |$port_config| {
     $port = $port_config['port']
     $protocol = $port_config['protocol'] ? {
       undef => 'tcp',
@@ -58,32 +47,48 @@ class base_server::firewall {
       default => $port_config['source']
     }
 
-    # Build the rule content based on source restriction
-    $rule_content = case $source {
+    # Convert source to UFW format
+    $ufw_source = case $source {
       'localhost': {
-        "${protocol} dport ${port} iifname lo accept"
+        '127.0.0.1'
       }
       'lan': {
-        "${protocol} dport ${port} ip saddr 10.0.0.0/8 accept"
+        '10.0.0.0/8'
       }
       'any': {
-        "${protocol} dport ${port} accept"
+        'any'
       }
       default: {
         # If source is a specific IP or CIDR, use it directly
-        "${protocol} dport ${port} ip saddr ${source} accept"
+        $source
       }
     }
 
-    nftables::rule { "allow-${protocol}-port-${port}-from-${source}":
-      content => $rule_content,
-      order   => sprintf('%02d', 20 + $i),
+    ufw::allow { "ufw-allow-${protocol}-${port}-from-${source}":
+      port => $port,
+      ip   => $ufw_source,
+      proto => $protocol,
     }
   }
 
-  # Drop everything else
-  nftables::rule { 'drop-all':
-    content => 'drop',
-    order   => '99',
+  # Enable UFW with default deny policy
+  ufw::limit { 'ufw-limit-ssh':
+    port => '22',
+  }
+
+  # Set default policies
+  ufw::default { 'ufw-default-incoming':
+    direction => 'incoming',
+    policy    => 'deny',
+  }
+
+  ufw::default { 'ufw-default-outgoing':
+    direction => 'outgoing',
+    policy    => 'allow',
+  }
+
+  # Enable UFW
+  ufw::enable { 'ufw-enable':
+    ensure => 'enabled',
   }
 }
