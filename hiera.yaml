@@ -9,5 +9,8 @@ hierarchy:
   - name: "Per-node data"
     path: "nodes.yaml"
 
+  - name: "Role definitions"
+    path: "roles.yaml"
+
   - name: "Global settings"
     path: "global.yaml"
