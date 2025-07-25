@@ -58,13 +58,6 @@ class base_server::firewall {
       }
     }
 
-  # Enable UFW with default deny policy
-  ufw_rule { 'limit-ssh':
-    ensure => 'present',
-    port   => '22',
-    limit  => true,
-  }
-
     ufw_rule { "allow-${protocol}-${port}-from-${source}":
       ensure => 'present',
       port   => $port,
@@ -73,21 +66,10 @@ class base_server::firewall {
     }
   }
 
-  # Set default policies
-  ufw_default { 'default-incoming':
-    ensure    => 'present',
-    direction => 'incoming',
-    policy    => 'deny',
-  }
-
-  ufw_default { 'default-outgoing':
-    ensure    => 'present',
-    direction => 'outgoing',
-    policy    => 'allow',
-  }
-
-  # Enable UFW
-  ufw_enable { 'enable-ufw':
-    ensure => 'enabled',
+  # Enable UFW with default deny policy
+  ufw_rule { 'limit-ssh':
+    ensure => 'present',
+    port   => '22',
+    limit  => true,
   }
 }
