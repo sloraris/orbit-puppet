@@ -59,10 +59,12 @@ class base_server::firewall {
     }
 
     ufw_rule { "allow-${protocol}-${port}-from-${source}":
-      ensure => 'present',
-      to_ports_app  => $port,
-      ip            => $ufw_source,
-      proto         => $protocol,
+      ensure          => 'present',
+      action          => 'allow',
+      direction       => 'in',
+      to_ports_app    => $port,
+      from_addr       => $ufw_source,
+      proto           => $protocol,
     }
   }
 
@@ -70,6 +72,8 @@ class base_server::firewall {
   ufw_rule { 'limit-ssh':
     ensure        => 'present',
     to_ports_app  => '22',
-    limit         => true,
+    action        => 'allow',
+    direction     => 'in',
+    from_addr     => '10.0.0.0/8',
   }
 }
