@@ -13,7 +13,7 @@ class base_server::apt {
   }
 
   # Install essential packages
-  package { ['curl', 'wget', 'gnupg', 'ca-certificates', 'software-properties-common']:
+  package { ['curl', 'wget', 'ca-certificates', 'software-properties-common']:
     ensure  => present,
     require => Class['apt'],
   }
