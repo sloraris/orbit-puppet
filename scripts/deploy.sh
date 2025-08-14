@@ -26,9 +26,9 @@ error() {
     exit 1
 }
 
-# Check if running as root
-if [[ $EUID -ne 0 ]]; then
-   error "This script must be run as root"
+# Check if running as root or with sudo
+if [[ $EUID -ne 0 ]] && [[ -z "$SUDO_USER" ]]; then
+   error "This script must be run as root or with sudo"
 fi
 
 # Install Puppet if not present
@@ -71,11 +71,20 @@ chmod -R 755 "$PUPPET_DIR"
 
 # Run Puppet
 log "Running Puppet apply..."
-puppet apply \
-    --environment="$PUPPET_ENV" \
-    --environmentpath="/etc/puppet/code/environments" \
-    --detailed-exitcodes \
-    manifests/site.pp
+# If we have SUDO_USER, run as that user to preserve facts, otherwise run as current user
+if [[ -n "$SUDO_USER" ]]; then
+    sudo -u "$SUDO_USER" -E puppet apply \
+        --environment="$PUPPET_ENV" \
+        --environmentpath="/etc/puppet/code/environments" \
+        --detailed-exitcodes \
+        manifests/site.pp
+else
+    puppet apply \
+        --environment="$PUPPET_ENV" \
+        --environmentpath="/etc/puppet/code/environments" \
+        --detailed-exitcodes \
+        manifests/site.pp
+fi
 
 exit_code=$?
 

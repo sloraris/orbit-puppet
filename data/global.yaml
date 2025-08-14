@@ -16,7 +16,7 @@ docker::docker_users:
 
 # Docker Swarm settings
 docker_swarm_manager: "luna.orbit"
-docker_swarm_manager_ip: "10.0.0.10"  # Update with actual IP
+docker_swarm_manager_ip: "10.0.3.11"
 
 # Komodo node settings
 komodo_user: "komodo"

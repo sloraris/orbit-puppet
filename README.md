@@ -49,7 +49,7 @@ This setup uses **masterless Puppet** with:
 
 1. **Run the deployment script**:
    ```bash
-   curl -sSL https://raw.githubusercontent.com/your-username/orbit-puppet/main/scripts/deploy.sh | sudo bash
+   curl -sSL https://raw.githubusercontent.com/sloraris/orbit-puppet/main/scripts/deploy.sh | sudo bash
    ```
 
 2. **Setup automatic updates** (optional):
@@ -61,7 +61,7 @@ This setup uses **masterless Puppet** with:
 
 1. **Clone the repository**:
    ```bash
-   sudo git clone https://github.com/your-username/orbit-puppet.git /etc/puppet/code/environments/production
+   sudo git clone https://github.com/sloraris/orbit-puppet.git /etc/puppet/code/environments/production
    cd /etc/puppet/code/environments/production
    ```
 

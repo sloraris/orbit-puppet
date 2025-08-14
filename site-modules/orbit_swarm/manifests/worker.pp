@@ -3,7 +3,7 @@ class orbit_swarm::worker {
   require docker
 
   # Get configuration from Hiera
-  $manager_ip = lookup('docker_swarm_manager_ip', String, 'first', '10.0.0.10')
+  $manager_ip = lookup('docker_swarm_manager_ip', String, 'first', '10.0.3.11')
   $advertise_addr = lookup('docker_swarm_advertise_addr', String, 'first', $facts['networking']['ip'])
 
   # Join Docker Swarm as worker

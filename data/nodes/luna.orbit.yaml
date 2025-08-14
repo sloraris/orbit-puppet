@@ -4,4 +4,4 @@ roles:
   - swarm_manager
 
 # Docker Swarm manager configuration
-docker_swarm_advertise_addr: "10.0.0.10"  # Update with actual IP
+docker_swarm_advertise_addr: "10.0.3.11"
