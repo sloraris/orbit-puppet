@@ -34,17 +34,13 @@ fi
 # Install Puppet if not present
 if ! command -v puppet &> /dev/null; then
     log "Installing Puppet..."
-    wget https://apt.puppet.com/puppet7-release-$(lsb_release -cs).deb
-    dpkg -i puppet7-release-$(lsb_release -cs).deb
-    apt-get update
-    apt-get install -y puppet-agent
-    rm puppet7-release-$(lsb_release -cs).deb
+    apt install -y puppet-agent
 fi
 
 # Install r10k if not present
 if ! command -v r10k &> /dev/null; then
     log "Installing r10k..."
-    apt install r10k -y
+    apt install -y r10k
 fi
 
 # Create puppet directory if it doesn't exist
