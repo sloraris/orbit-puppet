@@ -7,7 +7,7 @@ defaults:
 
 hierarchy:
   - name: "Per-node data"
-    path: "nodes/%{::trusted.certname}.yaml"
+    path: "nodes/%{facts.networking.hostname}.yaml"
 
   - name: "Role definitions"
     path: "roles.yaml"
