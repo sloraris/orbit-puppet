@@ -4,7 +4,7 @@ forge 'https://forge.puppet.com'
 moduledir 'modules'
 
 # External dependencies
-mod 'puppetlabs-stdlib', '9.6.0'
+mod 'puppetlabs-stdlib', '9.7.0'
 mod 'puppetlabs-apt', '10.0.1'
 mod 'puppetlabs-docker', '10.3.0'
 mod 'puppetlabs-firewall', '3.6.0'
