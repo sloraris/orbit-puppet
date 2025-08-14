@@ -36,15 +36,12 @@ Temporary Items
 *.pid
 *.lock
 
-# Puppet modules and manifests
-# Uncomment if you want to ignore specific module directories
-# modules/*/spec/fixtures/
-# modules/*/spec/acceptance/
-# modules/*/spec/unit/
+# External modules installed by r10k
+modules/
+modules/*
 
-# Puppet environments
-# environments/*/modules/
-# environments/*/manifests/
+# r10k cache
+.r10k/
 
 # Puppet server
 # Uncomment if using Puppet server
