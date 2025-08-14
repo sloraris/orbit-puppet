@@ -4,7 +4,7 @@
 set -e
 
 PUPPET_ENV=${PUPPET_ENV:-production}
-REPO_URL=${REPO_URL:-"https://github.com/your-username/orbit-puppet.git"}
+REPO_URL=${REPO_URL:-"https://github.com/sloraris/orbit-puppet.git"}
 PUPPET_DIR="/etc/puppet/code/environments/${PUPPET_ENV}"
 
 # Colors for output
@@ -26,9 +26,9 @@ error() {
     exit 1
 }
 
-# Check if running as root or with sudo
-if [[ $EUID -ne 0 ]] && [[ -z "$SUDO_USER" ]]; then
-   error "This script must be run as root or with sudo"
+# Check if running as root
+if [[ $EUID -ne 0 ]]; then
+   error "This script must be run as root"
 fi
 
 # Install Puppet if not present
@@ -71,20 +71,13 @@ chmod -R 755 "$PUPPET_DIR"
 
 # Run Puppet
 log "Running Puppet apply..."
-# If we have SUDO_USER, run as that user to preserve facts, otherwise run as current user
-if [[ -n "$SUDO_USER" ]]; then
-    sudo -u "$SUDO_USER" -E puppet apply \
-        --environment="$PUPPET_ENV" \
-        --environmentpath="/etc/puppet/code/environments" \
-        --detailed-exitcodes \
-        manifests/site.pp
-else
-    puppet apply \
-        --environment="$PUPPET_ENV" \
-        --environmentpath="/etc/puppet/code/environments" \
-        --detailed-exitcodes \
-        manifests/site.pp
-fi
+puppet apply \
+    --confdir=/etc/puppet \
+    --vardir=/var/cache/puppet \
+    --environment="$PUPPET_ENV" \
+    --environmentpath="/etc/puppet/code/environments" \
+    --detailed-exitcodes \
+    manifests/site.pp
 
 exit_code=$?
 

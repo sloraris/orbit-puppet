@@ -7,8 +7,9 @@ This repository contains the Puppet configuration for ORBIT homelab, providing a
 This setup uses **masterless Puppet** with:
 - GitHub repository as the source of truth
 - GitHub Actions for validation and CI/CD
-- Each node pulls configuration directly from Git
+- Each node pulls configuration directly from Git and manages itself independently
 - r10k for external module management
+- Docker Swarm for cross-node networking (deployments handled by Komodo)
 - Proper separation of external and custom modules
 
 ## Infrastructure Components
@@ -23,9 +24,9 @@ This setup uses **masterless Puppet** with:
 
 ### Current Nodes
 
-- **luna.orbit** - x86 machine (Swarm manager)
-- **artemis.orbit** - Pi 5 (Swarm worker)
-- **echo.orbit** - Pi 5 (Swarm worker)
+- **luna.orbit** - Pi 5 at 10.0.3.11 (Swarm manager, web portals/monitoring)
+- **artemis.orbit** - x86 machine at 10.0.3.30 (Swarm worker, heavy workloads)
+- **echo.orbit** - Pi 5 at 10.0.3.12 (Swarm worker, web portals/monitoring)
 
 ## Module Structure
 
@@ -140,26 +141,25 @@ GitHub Actions automatically:
 
 ## Docker Swarm Setup
 
-Docker Swarm is managed using the official `puppetlabs-docker` module with the following configuration:
+Docker Swarm is used primarily for **cross-node networking** to simplify Traefik and container communication. Actual deployments are handled by Komodo.
 
-### Manager Node (luna.orbit)
-- Automatically initializes the swarm cluster
-- Configured via `docker::swarm_init: true` in node data
-- Advertises on the specified IP address
+### Manager Node (luna.orbit - Pi 5)
+- Initializes and manages the swarm cluster at 10.0.3.11
+- Handles lightweight workloads and web portals
 
-### Worker Nodes (artemis.orbit, echo.orbit)
-- Automatically join the swarm cluster
-- Configured via `docker::swarm_join: true` in node data
-- Connect to the manager IP specified in configuration
+### Worker Nodes
+- **artemis.orbit** (x86 at 10.0.3.30): Heavy workloads and resource-intensive applications
+- **echo.orbit** (Pi 5 at 10.0.3.12): Web portals, monitoring, and logging
 
-### Manual Override
-If automatic join fails, you can still manually join workers:
+### Manual Swarm Setup
+Since token distribution is manual for security:
 ```bash
-# On manager node
+# On manager (luna)
+docker swarm init --advertise-addr 10.0.3.11
 docker swarm join-token worker
 
-# On worker nodes
-docker swarm join --token <token> <manager-ip>:2377
+# On workers (artemis & echo)
+docker swarm join --token <token> 10.0.3.11:2377
 ```
 
 ## Troubleshooting
