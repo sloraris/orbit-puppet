@@ -9,6 +9,15 @@ base_users:
 github_user: "sloraris"
 ssh_user: "orbit"
 
+# Docker configuration
+docker::manage_users: true
+docker::docker_users:
+  - "orbit"
+
+# Docker Swarm settings
+docker_swarm_manager: "luna.orbit"
+docker_swarm_manager_ip: "10.0.0.10"  # Update with actual IP
+
 # Komodo node settings
 komodo_user: "komodo"
 komodo_group: "komodo"

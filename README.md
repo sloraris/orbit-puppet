@@ -32,10 +32,12 @@ This setup uses **masterless Puppet** with:
 ```
 ├── site-modules/          # Custom modules (tracked in Git)
 │   ├── base_server/       # Base server configuration
-│   ├── docker/           # Docker installation and setup
-│   ├── swarm/            # Docker Swarm management
 │   └── komodo/           # Komodo application deployment
 ├── modules/              # External modules (installed by r10k, not tracked)
+│   ├── docker/           # Official puppetlabs-docker module
+│   ├── apt/              # APT package management
+│   ├── ufw/              # UFW firewall management
+│   └── ...               # Other external dependencies
 ├── manifests/            # Main site manifest
 ├── data/                 # Hiera data files
 └── scripts/              # Deployment and utility scripts
@@ -138,16 +140,27 @@ GitHub Actions automatically:
 
 ## Docker Swarm Setup
 
+Docker Swarm is managed using the official `puppetlabs-docker` module with the following configuration:
+
 ### Manager Node (luna.orbit)
-The swarm is automatically initialized on the manager node.
+- Automatically initializes the swarm cluster
+- Configured via `docker::swarm_init: true` in node data
+- Advertises on the specified IP address
 
 ### Worker Nodes (artemis.orbit, echo.orbit)
-Workers need manual join for security. On the manager, get the join token:
-```bash
-docker swarm join-token worker
-```
+- Automatically join the swarm cluster
+- Configured via `docker::swarm_join: true` in node data
+- Connect to the manager IP specified in configuration
 
-Then run the provided command on each worker node.
+### Manual Override
+If automatic join fails, you can still manually join workers:
+```bash
+# On manager node
+docker swarm join-token worker
+
+# On worker nodes
+docker swarm join --token <token> <manager-ip>:2377
+```
 
 ## Troubleshooting
 

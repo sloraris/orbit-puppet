@@ -44,7 +44,7 @@ fi
 # Install r10k if not present
 if ! command -v r10k &> /dev/null; then
     log "Installing r10k..."
-    /opt/puppetlabs/puppet/bin/gem install r10k
+    gem install r10k
 fi
 
 # Create puppet directory if it doesn't exist
@@ -63,7 +63,7 @@ fi
 
 # Install external modules
 log "Installing external modules with r10k..."
-/opt/puppetlabs/puppet/bin/r10k puppetfile install
+r10k puppetfile install
 
 # Set proper permissions
 chown -R root:root "$PUPPET_DIR"
@@ -71,7 +71,7 @@ chmod -R 755 "$PUPPET_DIR"
 
 # Run Puppet
 log "Running Puppet apply..."
-/opt/puppetlabs/bin/puppet apply \
+puppet apply \
     --environment="$PUPPET_ENV" \
     --environmentpath="/etc/puppet/code/environments" \
     --detailed-exitcodes \

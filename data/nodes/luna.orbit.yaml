@@ -2,3 +2,7 @@ roles:
   - base
   - swarm
   - swarm_manager
+
+# Docker Swarm manager configuration
+docker::swarm_init: true
+docker::swarm_advertise_addr: "10.0.0.10"  # Update with actual IP

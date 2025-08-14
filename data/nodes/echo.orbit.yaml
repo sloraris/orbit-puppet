@@ -1,3 +1,7 @@
 roles:
   - base
   - swarm
+
+# Docker Swarm worker configuration
+docker::swarm_join: true
+docker::swarm_manager_ip: "10.0.0.10"  # Update with actual manager IP
