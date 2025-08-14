@@ -84,29 +84,17 @@
 # @param log_driver
 #   Set the log driver.
 #   Docker default is json-file.
-#   Valid values: none, json-file, syslog, journald, gelf, fluentd
-#   Valid values description:
-#     none     : Disables any logging for the container.
-#                docker logs won't be available with this driver.
-#     json-file: Default logging driver for Docker.
-#                Writes JSON messages to file.
-#     syslog   : Syslog logging driver for Docker.
-#                Writes log messages to syslog.
-#     journald : Journald logging driver for Docker.
-#                Writes log messages to journald.
-#     gelf     : Graylog Extended Log Format (GELF) logging driver for Docker.
-#                Writes log messages to a GELF endpoint: Graylog or Logstash.
-#     fluentd  : Fluentd logging driver for Docker.
-#                Writes log messages to fluentd (forward input).
-#     splunk   : Splunk logging driver for Docker.
-#                Writes log messages to Splunk (HTTP Event Collector).
-#     awslogs  : AWS Cloudwatch Logs logging driver for Docker.
-#                Write log messages to Cloudwatch API
+#   Please verify the value by yourself, before setting it. Valid shipped log drivers can be found here:
+#   https://docs.docker.com/config/containers/logging/configure/#supported-logging-drivers
+#   Since custom log driver plugins are and must be possible, the value can not be verified through code here.
 #
 # @param log_opt
 #   Set the log driver specific options
 #   Valid values per log driver:
 #     none     : undef
+#     local    :
+#                max-size=[0-9+][k|m|g]
+#                max-file=[0-9+]
 #     json-file:
 #                max-size=[0-9+][k|m|g]
 #                max-file=[0-9+]
@@ -259,6 +247,9 @@
 # @param docker_users
 #   Specify an array of users to add to the docker group
 #
+# @param create_user
+#   If `true` the list of `docker_users` will be created as well as added to the docker group
+#
 # @param docker_group
 #   Specify a string for the docker group
 #
@@ -356,6 +347,7 @@
 # @param service_hasstatus
 # @param service_hasrestart
 # @param acknowledge_unsupported_os
+# @param have_systemd_v230
 #
 class docker (
   Optional[String]                        $version                           = $docker::params::version,
@@ -446,6 +438,7 @@ class docker (
   Optional[String]                        $package_source                    = $docker::params::package_source,
   Optional[String]                        $service_name                      = $docker::params::service_name,
   Array                                   $docker_users                      = [],
+  Boolean                                 $create_user                       = true,
   String                                  $docker_group                      = $docker::params::docker_group,
   Array                                   $daemon_environment_files          = [],
   Optional[Variant[String,Hash]]          $repo_opt                          = $docker::params::repo_opt,
@@ -497,18 +490,6 @@ class docker (
   if $log_level {
     assert_type(Pattern[/^(debug|info|warn|error|fatal)$/], $log_level) |$a, $b| {
       fail('log_level must be one of debug, info, warn, error or fatal')
-    }
-  }
-
-  if $log_driver {
-    if $facts['os']['family'] == 'windows' {
-      assert_type(Pattern[/^(none|json-file|syslog|gelf|fluentd|splunk|awslogs|etwlogs)$/], $log_driver) |$a, $b| {
-        fail('log_driver must be one of none, json-file, syslog, gelf, fluentd, splunk, awslogs or etwlogs')
-      }
-    } else {
-      assert_type(Pattern[/^(none|json-file|syslog|journald|gelf|fluentd|splunk|awslogs)$/], $log_driver) |$a, $b| {
-        fail('log_driver must be one of none, json-file, syslog, journald, gelf, fluentd, splunk or awslogs')
-      }
     }
   }
 
@@ -566,7 +547,7 @@ class docker (
     if ($docker_ee) {
       $package_location         = $docker::docker_ee_source_location
       $package_key_source       = $docker::docker_ee_key_source
-      $package_key_check_source = true
+      $package_key_check_source = $docker_package_key_check_source
       $package_key              = $docker::docker_ee_key_id
       $package_repos            = $docker::docker_ee_repos
       $release                  = $docker::docker_ee_release
@@ -584,7 +565,7 @@ class docker (
         'RedHat' : {
           $package_location         = $docker_ce_source_location
           $package_key_source       = $docker_ce_key_source
-          $package_key_check_source = true
+          $package_key_check_source = $docker_package_key_check_source
         }
         'windows': {
           fail('This module only work for Docker Enterprise Edition on Windows.')

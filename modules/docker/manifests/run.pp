@@ -244,7 +244,7 @@ define docker::run (
   Boolean                                   $remove_container_on_stop          = true,
   Boolean                                   $remove_volume_on_start            = false,
   Boolean                                   $remove_volume_on_stop             = false,
-  Integer                                   $stop_wait_time                    = 0,
+  Integer                                   $stop_wait_time                    = 10,
   Optional[String]                          $syslog_identifier                 = undef,
   Optional[String]                          $syslog_facility                   = undef,
   Boolean                                   $read_only                         = false,
@@ -309,7 +309,7 @@ define docker::run (
   $depends_array          = any2array($depends)
   $depend_services_array  = any2array($depend_services)
 
-  $docker_run_flags = docker_run_flags( {
+  $docker_run_flags = docker_run_flags({
       cpuset                => any2array($cpuset),
       disable_network       => $disable_network,
       dns                   => any2array($dns),
@@ -355,11 +355,11 @@ define docker::run (
   }
 
   if $facts['os']['family'] == 'windows' {
-    $exec_environment        = "PATH=${::docker_program_files_path}/Docker/;${::docker_systemroot}/System32/"
+    $exec_environment        = "PATH=${facts['docker_program_files_path']}/Docker/;${facts['docker_systemroot']}/System32/"
     $exec_timeout            = 3000
-    $exec_path               = ["${::docker_program_files_path}/Docker/"]
+    $exec_path               = ["${facts['docker_program_files_path']}/Docker/"]
     $exec_provider           = 'powershell'
-    $cidfile                 = "${::docker_user_temp_path}/${service_prefix}${sanitised_title}.cid"
+    $cidfile                 = "${facts['docker_user_temp_path']}/${service_prefix}${sanitised_title}.cid"
     $restart_check           = "${docker_command} inspect ${sanitised_title} -f '{{ if eq \\\"unhealthy\\\" .State.Health.Status }} {{ .Name }}{{ end }}' | findstr ${sanitised_title}" # lint:ignore:140chars
     $container_running_check = "\$state = ${docker_command} inspect ${sanitised_title} -f \"{{ .State.Running }}\"; if (\$state -ieq \"true\") { Exit 0 } else { Exit 1 }" # lint:ignore:140chars
   } else {
@@ -505,7 +505,7 @@ define docker::run (
           fail('Restart parameter is required for Windows')
         }
 
-        $hasstatus = $::docker::params::service_hasstatus
+        $hasstatus = $docker::params::service_hasstatus
       }
     }
 
