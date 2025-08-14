@@ -9,6 +9,8 @@ role_classes:
         source: lan
 
   swarm:
+    classes:
+      - orbit_swarm::worker
     ports:
       - port: 7946
         protocol: tcp
@@ -21,6 +23,8 @@ role_classes:
         source: lan
 
   swarm_manager:
+    classes:
+      - orbit_swarm::manager
     ports:
       - port: 2377
         protocol: tcp
