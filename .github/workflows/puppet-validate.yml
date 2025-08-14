@@ -1,0 +1,43 @@
+name: Puppet Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0'
+        bundler-cache: true
+
+    - name: Install Puppet and dependencies
+      run: |
+        gem install puppet -v '~> 7.0'
+        gem install r10k
+        gem install puppet-lint
+
+    - name: Install modules
+      run: r10k puppetfile install
+
+    - name: Validate Puppet syntax
+      run: |
+        find manifests -name "*.pp" -exec puppet parser validate {} \;
+        find site-modules -name "*.pp" -exec puppet parser validate {} \;
+
+    - name: Lint Puppet code
+      run: |
+        puppet-lint --fail-on-warnings manifests/
+        puppet-lint --fail-on-warnings site-modules/
+
+    - name: Validate Hiera data
+      run: |
+        find data -name "*.yaml" -exec ruby -ryaml -e "YAML.load_file('{}'); puts 'Valid: {}'" \;

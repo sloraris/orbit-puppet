@@ -1,145 +1,193 @@
 # Orbit Puppet Infrastructure
 
-This repository contains the Puppet configuration for ORBIT, providing automated server provisioning and configuration management.
+This repository contains the Puppet configuration for ORBIT homelab, providing automated server provisioning and configuration management using a **masterless Puppet** approach.
 
-## Overview
+## Architecture Overview
 
-This repository is designed to manage a distributed system with Docker Swarm clusters and Komodo nodes. It provides:
-
-- **Base server configuration** with security hardening
-- **Docker and Docker Swarm** management
-- **Komodo** node configuration for docker stack deployment automation and management
-- **Role-based** node classification
-- **Hierarchical data** management with Hiera
+This setup uses **masterless Puppet** with:
+- GitHub repository as the source of truth
+- GitHub Actions for validation and CI/CD
+- Each node pulls configuration directly from Git
+- r10k for external module management
+- Proper separation of external and custom modules
 
 ## Infrastructure Components
 
 ### Roles
 
-- **base** - Basic server configuration with Docker
+- **base** - Basic server configuration with Docker and security hardening
 - **swarm** - Docker Swarm worker node
 - **swarm_manager** - Docker Swarm manager node
 - **komodo_core** - Komodo core node configuration
 - **komodo_periphery** - Komodo periphery node configuration
 
+### Current Nodes
+
+- **luna.orbit** - x86 machine (Swarm manager)
+- **artemis.orbit** - Pi 5 (Swarm worker)
+- **echo.orbit** - Pi 5 (Swarm worker)
+
 ## Module Structure
 
-### Custom Modules
+```
+├── site-modules/          # Custom modules (tracked in Git)
+│   ├── base_server/       # Base server configuration
+│   ├── docker/           # Docker installation and setup
+│   ├── swarm/            # Docker Swarm management
+│   └── komodo/           # Komodo application deployment
+├── modules/              # External modules (installed by r10k, not tracked)
+├── manifests/            # Main site manifest
+├── data/                 # Hiera data files
+└── scripts/              # Deployment and utility scripts
+```
 
-- **orbit-base_server** - Base server configuration including users, SSH, and security
-- **orbit-docker** - Docker installation and configuration
-- **orbit-swarm** - Docker Swarm cluster management
-- **orbit-komodo** - Komodo application deployment and configuration
+## Quick Start
 
-### External Dependencies
+### Initial Setup on a New Node
 
-- `puppetlabs/stdlib` (~> 8.0)
-- `puppetlabs/apt` (~> 8.0)
-- `puppetlabs/nftables` (~> 1.0)
-- `puppetlabs/firewall` (~> 3.0)
+1. **Run the deployment script**:
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/your-username/orbit-puppet/main/scripts/deploy.sh | sudo bash
+   ```
+
+2. **Setup automatic updates** (optional):
+   ```bash
+   sudo /etc/puppet/code/environments/production/scripts/setup-cron.sh
+   ```
+
+### Manual Deployment
+
+1. **Clone the repository**:
+   ```bash
+   sudo git clone https://github.com/your-username/orbit-puppet.git /etc/puppet/code/environments/production
+   cd /etc/puppet/code/environments/production
+   ```
+
+2. **Install external modules**:
+   ```bash
+   sudo /opt/puppetlabs/puppet/bin/r10k puppetfile install
+   ```
+
+3. **Run Puppet**:
+   ```bash
+   sudo /opt/puppetlabs/bin/puppet apply --environment=production --environmentpath=/etc/puppet/code/environments manifests/site.pp
+   ```
 
 ## Configuration
 
+### Adding a New Node
+
+1. Create a new file in `data/nodes/` named `<hostname>.yaml`:
+   ```yaml
+   roles:
+     - base
+     - swarm  # or swarm_manager for the manager node
+   ```
+
+2. Commit and push the changes
+3. Run the deployment script on the new node
+
+### Adding a New Role
+
+1. Define the role in `data/roles.yaml`:
+   ```yaml
+   role_classes:
+     my_new_role:
+       classes:
+         - my_module::my_class
+       ports:
+         - port: 8080
+           protocol: tcp
+           source: lan
+   ```
+
+2. Create the corresponding module in `site-modules/`
+3. Assign the role to nodes in their respective YAML files
+
 ### Hiera Data Structure
 
-The configuration uses Hiera 5 with the following hierarchy:
+The configuration uses Hiera 5 with this hierarchy:
 
-1. **Per-node data** (`nodes.yml`) - Node-specific configurations
-2. **Global settings** (`global.yml`) - Shared configuration across all nodes
+1. **Per-node data** (`data/nodes/<hostname>.yaml`) - Node-specific configurations
+2. **Role definitions** (`data/roles.yaml`) - Role-based class and port definitions
+3. **Global settings** (`data/global.yaml`) - Shared configuration across all nodes
 
-### Key Configuration Files
+## Security Features
 
-- `Puppetfile` - Module dependencies and sources
-- `hiera.yml` - Hiera configuration
-- `manifests/site.pp` - Main site manifest
-- `data/` - Hiera data files
-
-## Getting Started
-
-### Prerequisites
-
-- Puppet 7+ installed on target nodes
-- Access to Puppet Forge for external modules
-- SSH access to managed nodes
-
-### Installation
-
-#### For Puppet Master Setup
-
-1. **Clone the repository** (if not already done):
-   ```bash
-   cd /etc/puppet/code/environments/production
-   git clone <repository-url> .
-   ```
-
-2. **Install module dependencies**:
-   ```bash
-   r10k puppetfile install
-   ```
-
-3. **Set proper permissions**:
-   ```bash
-   chown -R pe-puppet:pe-puppet /etc/puppetlabs/code/environments/production
-   chmod -R 755 /etc/puppetlabs/code/environments/production
-   ```
-
-4. **Restart Puppet services**:
-   ```bash
-   systemctl restart ppuppetserver
-   ```
-
-#### For Puppet Nodes
-
-1. **Ensure the node is enrolled** with the Puppet master
-2. **Set the environment** (if not using production):
-   ```bash
-   puppet config set environment production
-   ```
-3. **Run the initial Puppet agent**:
-   ```bash
-   puppet agent --test
-   ```
-
-### Node Classification
-
-Nodes are classified based on their hostname in `data/nodes.yml`. Each node can have multiple roles assigned, which determine which Puppet classes are applied.
-
-Example node configuration:
-```yaml
-luna.orbit:
-  roles:
-    - swarm
-    - swarm_manager
-```
-
-## Security
-
-The base server configuration includes:
-
-- SSH key-based authentication
-- Firewall configuration with nftables
-- User management with restricted access
-- Security hardening measures
+- **SSH key-based authentication** (pulls keys from GitHub)
+- **UFW firewall** with role-based port management
+- **User management** with restricted access
+- **Docker security** with proper user group management
 
 ## Network Configuration
 
-### Required Ports
+### Required Ports (automatically managed)
 
-- **SSH**: 22/tcp
-- **Docker Swarm**: 7946/tcp+udp, 4789/udp
-- **Swarm Manager**: 2377/tcp
-- **Komodo**: 8120/tcp
+- **SSH**: 22/tcp (LAN only)
+- **Docker Swarm**: 7946/tcp+udp, 4789/udp (LAN only)
+- **Swarm Manager**: 2377/tcp (LAN only)
+- **Komodo**: 8120/tcp (configurable)
+
+## CI/CD Pipeline
+
+GitHub Actions automatically:
+- Validates Puppet syntax
+- Lints Puppet code
+- Validates Hiera YAML files
+- Runs on every push and pull request
+
+## Docker Swarm Setup
+
+### Manager Node (luna.orbit)
+The swarm is automatically initialized on the manager node.
+
+### Worker Nodes (artemis.orbit, echo.orbit)
+Workers need manual join for security. On the manager, get the join token:
+```bash
+docker swarm join-token worker
+```
+
+Then run the provided command on each worker node.
+
+## Troubleshooting
+
+### Check Puppet Logs
+```bash
+sudo tail -f /var/log/puppet-cron.log
+```
+
+### Manual Puppet Run with Debug
+```bash
+sudo /opt/puppetlabs/bin/puppet apply --debug --environment=production --environmentpath=/etc/puppet/code/environments manifests/site.pp
+```
+
+### Validate Configuration
+```bash
+# Check syntax
+find manifests site-modules -name "*.pp" -exec puppet parser validate {} \;
+
+# Check Hiera data
+find data -name "*.yaml" -exec ruby -ryaml -e "YAML.load_file('{}'); puts 'Valid: {}'" \;
+```
 
 ## Development
 
-### Adding New Nodes
+### Local Testing
+1. Fork the repository
+2. Make changes in a feature branch
+3. GitHub Actions will validate your changes
+4. Test on a development node before merging
 
-1. Add the node to `data/nodes.yml`
-2. Assign appropriate roles
-3. Configure node-specific settings if needed
+### Module Development
+- Custom modules go in `site-modules/`
+- Follow Puppet best practices
+- Include proper error handling and idempotency
+- Document any new roles or configuration options
 
-### Creating New Roles
+## Support
 
-1. Define the role in `data/roles.yml`
-2. Specify required classes and ports
-3. Update node configurations to use the new role
+For issues or questions:
+1. Check the GitHub Actions logs for validation errors
+2. Review Puppet logs on the affected nodes
+3. Ensure all required ports are open between nodes
+4. Verify Hiera data syntax and structure

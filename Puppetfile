@@ -1,15 +1,12 @@
 forge 'https://forge.puppet.com'
 
-# External dependencies
-mod 'puppetlabs/stdlib', '8.0.0'
-mod 'puppetlabs/apt', '8.0.0'
-mod 'puppetlabs/firewall', '3.0.0'
-mod 'puppetlabs/concat', '6.0.0'
-mod 'kogitoapp-ufw', '1.0.3'
-mod 'puppet/systemd', '4.0.0'
+# Set module path for external modules
+moduledir 'modules'
 
-# Local modules
-mod 'orbit-base_server', :local => true
-mod 'orbit-docker', :local => true
-mod 'orbit-swarm', :local => true
-mod 'orbit-komodo', :local => true
+# External dependencies
+mod 'puppetlabs/stdlib', '~> 8.0'
+mod 'puppetlabs/apt', '~> 8.0'
+mod 'puppetlabs/firewall', '~> 3.0'
+mod 'puppetlabs/concat', '~> 6.0'
+mod 'kogitoapp-ufw', '~> 1.0'
+mod 'puppet/systemd', '~> 4.0'
