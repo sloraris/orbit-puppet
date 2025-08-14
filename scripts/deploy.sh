@@ -44,7 +44,7 @@ fi
 # Install r10k if not present
 if ! command -v r10k &> /dev/null; then
     log "Installing r10k..."
-    gem install r10k
+    apt install r10k -y
 fi
 
 # Create puppet directory if it doesn't exist
