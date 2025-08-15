@@ -7,6 +7,7 @@ set -euo pipefail
 VARIABLES_HOST="<%= lookup('variables_host') %>"
 VARIABLES_NFS_PATH="/mnt/nas/homelab/variables"
 VARIABLES_FILE="orbit-puppet.yaml"
+VARIABLES_NAS_PATH="/var/nfs/shared/homelab/variables"
 TEMP_FILE="/tmp/orbit-puppet-update.yaml"
 
 log() {
@@ -41,7 +42,7 @@ log "Mounting NFS and fetching current external variables file..."
 mkdir -p "$VARIABLES_NFS_PATH"
 
 # Mount NFS share
-if ! mount -t nfs "${VARIABLES_HOST}:/volume1/homelab/variables" "$VARIABLES_NFS_PATH" 2>/dev/null; then
+if ! mount -t nfs "${VARIABLES_HOST}:${VARIABLES_NAS_PATH}" "$VARIABLES_NFS_PATH" 2>/dev/null; then
     log "ERROR: Failed to mount NFS share"
     exit 1
 fi
