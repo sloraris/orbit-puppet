@@ -11,4 +11,22 @@ class orbit_swarm::manager {
     advertise_addr => $advertise_addr,
     listen_addr    => $advertise_addr,
   }
+
+  # Simple script to update tokens on NAS after swarm init
+  file { '/usr/local/bin/update-swarm-tokens':
+    ensure  => file,
+    mode    => '0755',
+    owner   => 'root',
+    group   => 'root',
+    content => template('orbit_swarm/update-swarm-tokens.sh.erb'),
+    require => Docker::Swarm['swarm_manager'],
+  }
+
+  # Run the token update script once after swarm initialization
+  exec { 'update-swarm-tokens':
+    command     => '/usr/local/bin/update-swarm-tokens',
+    refreshonly => true,
+    subscribe   => Docker::Swarm['swarm_manager'],
+    require     => File['/usr/local/bin/update-swarm-tokens'],
+  }
 }
