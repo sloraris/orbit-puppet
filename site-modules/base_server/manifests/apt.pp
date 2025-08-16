@@ -12,9 +12,20 @@ class base_server::apt {
     },
   }
 
+  # Enable universe repo
+  apt::source { 'ubuntu-universe':
+    location => 'http://archive.ubuntu.com/ubuntu',
+    release  => $facts['os']['distro']['codename'],
+    repos    => 'universe',
+    include  => {
+      'src' => false,
+    },
+    require  => Class['apt'],
+  }
+
   # Install essential packages
   package { ['curl', 'wget', 'ca-certificates', 'software-properties-common']:
     ensure  => present,
-    require => Class['apt'],
+    require => [Class['apt'], Apt::Source['ubuntu-universe']],
   }
 }
