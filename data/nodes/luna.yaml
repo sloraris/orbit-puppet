@@ -1,7 +1,7 @@
 roles:
   - base
-  - swarm
-  - swarm_manager
+  # - swarm
+  # - swarm_manager
 
 # Docker Swarm manager configuration
 docker_swarm_advertise_addr: "10.0.3.11"

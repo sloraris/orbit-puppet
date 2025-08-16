@@ -5,12 +5,7 @@
 class orbit_swarm (
   String $role = 'worker', # 'manager' or 'worker'
 ) {
-
-  class { 'docker':
-  use_upstream_package_source => false,
-  service_overrides_template  => false,
-  docker_ce_package_name      => 'docker',
-  }
+  include 'docker'
 
   case $role {
     'manager': {

@@ -1,6 +1,6 @@
 roles:
   - base
-  - swarm
+  # - swarm
 
 # Docker Swarm worker configuration
 docker_swarm_advertise_addr: "10.0.3.30"
