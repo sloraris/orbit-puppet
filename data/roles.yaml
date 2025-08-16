@@ -1,8 +1,6 @@
 # Role-based class and port definitions
 role_classes:
   base:
-    classes:
-      - docker
     ports:
       - port: 22
         protocol: tcp

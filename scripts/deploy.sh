@@ -1,8 +1,6 @@
 #!/bin/bash
 # Puppet deployment script for masterless setup
 
-set -e
-
 PUPPET_ENV=${PUPPET_ENV:-production}
 REPO_URL=${REPO_URL:-"https://github.com/sloraris/orbit-puppet.git"}
 PUPPET_DIR="/etc/puppet/code/environments/${PUPPET_ENV}"

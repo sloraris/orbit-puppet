@@ -6,8 +6,11 @@ class orbit_swarm (
   String $role = 'worker', # 'manager' or 'worker'
 ) {
 
-  # Ensure Docker is installed first
-  require docker
+  class { 'docker':
+  use_upstream_package_source => false,
+  service_overrides_template  => false,
+  docker_ce_package_name      => 'docker',
+  }
 
   case $role {
     'manager': {
