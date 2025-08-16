@@ -5,7 +5,7 @@ class base_server::apt {
       frequency => 'daily',
       loglevel  => 'notice',
     },
-    purge => {
+    purge  => {
       'sources.list'   => false,  # Don't purge sources.list on newer Ubuntu
       'sources.list.d' => false,  # Don't purge sources.list.d on newer Ubuntu
       'preferences.d'  => false,  # Don't purge preferences.d on newer Ubuntu
