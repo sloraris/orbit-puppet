@@ -1,6 +1,7 @@
 roles:
   - base
   # - swarm
+  - komodo_periphery
 
 # Docker Swarm worker configuration
 docker_swarm_advertise_addr: "10.0.3.12"
