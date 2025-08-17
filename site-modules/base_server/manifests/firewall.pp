@@ -1,50 +1,50 @@
-# Firewall configuration for base servers
-# Allows all internal traffic while restricting external access to specific ports
+# Firewall configuration for base servers using iptables
+# Docker-friendly approach that doesn't interfere with container networking
 class base_server::firewall {
-  # Include UFW module
-  include ufw
-
-  # Allow all loopback traffic (essential for Docker and local services)
-  ufw_rule { 'allow-loopback-in':
-    ensure    => 'present',
-    action    => 'allow',
-    direction => 'in',
-    interface => 'lo',
+  # Ensure iptables is installed and UFW is disabled
+  package { 'iptables-persistent':
+    ensure => present,
   }
 
-  ufw_rule { 'allow-loopback-out':
-    ensure    => 'present',
-    action    => 'allow',
-    direction => 'out',
-    interface => 'lo',
+  service { 'ufw':
+    ensure => stopped,
+    enable => false,
   }
 
-  # Allow Docker bridge networks (typically 172.17.0.0/16 and 172.16.0.0/12)
-  # This allows container-to-container communication
-  ufw_rule { 'allow-docker-bridge':
-    ensure    => 'present',
-    action    => 'allow',
-    direction => 'in',
-    from_addr => '172.16.0.0/12',
+  # Create custom iptables chain for our rules
+  exec { 'create-custom-chain':
+    command => '/sbin/iptables -t filter -N PUPPET_INPUT 2>/dev/null || true',
+    unless  => '/sbin/iptables -t filter -L PUPPET_INPUT 2>/dev/null',
+    require => Package['iptables-persistent'],
   }
 
-  # Allow Docker Swarm overlay networks (typically 10.0.0.0/8 for swarm)
-  # But restrict to Docker's typical overlay range
-  ufw_rule { 'allow-docker-overlay':
-    ensure    => 'present',
-    action    => 'allow',
-    direction => 'in',
-    from_addr => '10.255.0.0/16',
+  # Basic iptables rules that work with Docker
+  # Allow loopback traffic
+  firewall { '001 allow loopback':
+    proto  => 'all',
+    iniface => 'lo',
+    action => 'accept',
   }
 
-  # Allow established and related connections (for outbound connections coming back)
-  ufw_rule { 'allow-established':
-    ensure    => 'present',
-    action    => 'allow',
-    direction => 'in',
-    from_addr => 'any',
-    to_addr   => 'any',
-    proto     => 'any',
+  # Allow established and related connections
+  firewall { '002 allow established':
+    proto  => 'all',
+    state  => ['RELATED', 'ESTABLISHED'],
+    action => 'accept',
+  }
+
+  # Allow all traffic on Docker interfaces (let Docker manage its own rules)
+  firewall { '003 allow docker0':
+    proto   => 'all',
+    iniface => 'docker0',
+    action  => 'accept',
+  }
+
+  # Allow traffic between Docker containers on bridge networks
+  firewall { '004 allow docker bridge':
+    proto  => 'all',
+    source => '172.16.0.0/12',
+    action => 'accept',
   }
 
   # Get roles and role classes for this node
@@ -62,8 +62,8 @@ class base_server::firewall {
     }
   })
 
-  # Create firewall rules for each port based on its source requirement
-  $role_ports.each |$port_config| {
+  # Create iptables rules for each port based on its source requirement
+  $role_ports.each |$index, $port_config| {
     $port = $port_config['port']
     $protocol = $port_config['protocol'] ? {
       undef   => 'tcp',
@@ -74,21 +74,48 @@ class base_server::firewall {
       default => $port_config['source']
     }
 
-    # Convert source to UFW format
-    $ufw_source = case $source {
-      'localhost': { '127.0.0.1' }
-      'lan':       { '10.0.0.0/8' }
-      'any':       { 'any' }
-      default:     { $source }
-    }
+    # Convert source to iptables format
+    $rule_number = sprintf('%03d', 100 + $index)
 
-    ufw_rule { "allow-${protocol}-${port}-from-${source}":
-      ensure       => 'present',
-      action       => 'allow',
-      direction    => 'in',
-      to_ports_app => $port,
-      from_addr    => $ufw_source,
-      proto        => $protocol,
+    case $source {
+      'localhost': {
+        firewall { "${rule_number} allow ${protocol}/${port} from localhost":
+          proto  => $protocol,
+          dport  => $port,
+          source => '127.0.0.1/32',
+          action => 'accept',
+        }
+      }
+      'lan': {
+        firewall { "${rule_number} allow ${protocol}/${port} from lan":
+          proto  => $protocol,
+          dport  => $port,
+          source => '10.0.0.0/8',
+          action => 'accept',
+        }
+      }
+      'any': {
+        firewall { "${rule_number} allow ${protocol}/${port} from any":
+          proto  => $protocol,
+          dport  => $port,
+          action => 'accept',
+        }
+      }
+      default: {
+        firewall { "${rule_number} allow ${protocol}/${port} from ${source}":
+          proto  => $protocol,
+          dport  => $port,
+          source => $source,
+          action => 'accept',
+        }
+      }
     }
+  }
+
+  # Drop all other incoming traffic (but allow outgoing)
+  firewall { '999 drop all other input':
+    proto  => 'all',
+    action => 'drop',
+    before => undef,
   }
 }
