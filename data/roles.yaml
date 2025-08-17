@@ -31,10 +31,6 @@ role_classes:
   komodo_core:
     classes:
       - komodo::core
-    ports:
-      - port: 8120
-        protocol: tcp
-        source: localhost
 
   komodo_periphery:
     classes:
