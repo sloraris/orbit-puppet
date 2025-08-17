@@ -11,6 +11,15 @@ class base_server::firewall {
     from_addr  => '10.0.0.0/8',
   }
 
+  # Always allow internal docker traffic
+  ufw_rule {'allow-docker-internal':
+    ensure     => 'present',
+    to_ports_app => 'lo',
+    action     => 'allow',
+    direction  => 'both',
+    from_addr  => 'lo',
+  }
+
   # Get roles and role classes for this node
   $roles = lookup('roles', Array[String], 'unique', [])
   $role_classes = lookup('role_classes', Hash, 'first', {})
