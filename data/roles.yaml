@@ -39,3 +39,12 @@ role_classes:
       - port: 8120
         protocol: tcp
         source: lan
+
+  traefik:
+    ports:
+      - port: 80
+        protocol: tcp
+        source: any
+      - port: 443
+        protocol: tcp
+        source: any

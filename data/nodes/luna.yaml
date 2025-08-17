@@ -3,6 +3,7 @@ roles:
   # - swarm
   # - swarm_manager
   - komodo_core
+  - traefik
 
 # Docker Swarm manager configuration
 docker_swarm_advertise_addr: "10.0.3.11"
