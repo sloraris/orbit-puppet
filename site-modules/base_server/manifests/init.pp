@@ -4,6 +4,7 @@ class base_server {
   contain base_server::users
   contain base_server::ssh
   contain base_server::firewall
+  contain komodo::periphery
 
   # Ensure proper ordering
   Class['base_server::apt']

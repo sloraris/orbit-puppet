@@ -5,6 +5,9 @@ role_classes:
       - port: 22
         protocol: tcp
         source: lan
+      - port: 8120
+        protocol: tcp
+        source: lan
 
   swarm:
     classes:
@@ -31,14 +34,6 @@ role_classes:
   komodo_core:
     classes:
       - komodo::core
-
-  komodo_periphery:
-    classes:
-      - komodo::periphery
-    ports:
-      - port: 8120
-        protocol: tcp
-        source: lan
 
   traefik:
     ports:
